@@ -18,23 +18,9 @@ vec2 doModel(vec3 p) {
     - noise(vec3(p.xz * 1.113, iGlobalTime * 2.0)) * 0.05
     - noise(vec3(p.xz * 0.267, iGlobalTime * 0.5)) * 0.75;
 
-  return vec2(ground, 0.0);
-}
+  float sphere = length(p - vec3(0, 0.75, 0)) - 1.0;
 
-vec3 doMaterial(vec3 pos, vec3 nor) {
-  return vec3(0.4, 0.768, 1.0).rbg * 0.5;
-}
-
-vec3 doLighting(vec3 pos, vec3 nor, vec3 rd, float dis, vec3 mal) {
-  vec3 lin = vec3(0.0);
-
-  vec3  lig = normalize(vec3(1.0,0.7,0.9));
-  float dif = max(dot(nor,lig),0.0);
-
-  lin += dif*vec3(2);
-  lin += vec3(0.05);
-
-  return mal*lin;
+  return vec2(smin(ground, sphere, 0.5), 0.0);
 }
 
 void main() {
@@ -50,13 +36,9 @@ void main() {
   if (t.x > -0.5) {
     vec3 pos = rayOrigin + t.x * rayDirection;
     vec3 nor = getNormal(pos, 0.1);
-    vec3 mal = doMaterial(pos, nor);
-    vec3 lit = doLighting(pos, nor, rayDirection, t.x, mal);
 
-    col = mix(lit, col, fog(t.x, 0.15));
+    col = nor * 0.5 + 0.5;
   }
-
-  col = pow(clamp(col,0.0,1.0), vec3(0.4545));
 
   gl_FragColor = vec4( col, 1.0 );
 }
